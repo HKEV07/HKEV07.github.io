@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { SectionWrapper } from "../hoc";
-import { space_man } from '../assets';
+import { resume, space_man } from '../assets';
 
 const Hero = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // Center by default
   const roles = ["Frontend Developer", "UI Designer", "Web Creator"];
   const [currentRole, setCurrentRole] = useState(0);
 
@@ -16,11 +15,19 @@ const Hero = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const handleMouseMove = (e) => {
+  const handlePointerMove = (e) => {
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    
     setMousePosition({
-      x: e.clientX / window.innerWidth,
-      y: e.clientY / window.innerHeight,
+      x: clientX / window.innerWidth,
+      y: clientY / window.innerHeight,
     });
+  };
+
+  const handleTouchMove = (e) => {
+    e.preventDefault(); 
+    handlePointerMove(e);
   };
 
   const socialLinks = [
@@ -31,26 +38,73 @@ const Hero = () => {
 
   return (
     <div 
-      className="relative bottom-20 min-h-screen w-full bg-gradient-to-br  overflow-hidden"
-      onMouseMove={handleMouseMove}
+      className="relative bottom-20 min-h-screen w-full bg-gradient-to-br overflow-hidden touch-none"
+      onMouseMove={handlePointerMove}
+      onTouchMove={handleTouchMove}
+      onTouchStart={handleTouchMove}
     >
-      <div className="absolute inset-0 opacity-20">
-        <div className="absolute w-96 h-96 bg-purple-500 rounded-full filter blur-3xl animate-pulse" 
+      <div className="fixed inset-0 pointer-events-none">
+        <motion.div 
+          className="absolute w-[800px] h-[800px] bg-purple-200/10 rounded-full filter blur-[100px]"
           style={{ 
             left: `${mousePosition.x * 100}%`,
             top: `${mousePosition.y * 100}%`,
-            transform: 'translate(-50%, -50%)'
+            transform: 'translate(-50%, -50%)',
+          }}
+          animate={{
+            x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
+            y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
+          }}
+          transition={{
+            type: "spring",
+            damping: 30,
+            stiffness: 200
+          }}
+        />
+        
+        <motion.div 
+          className="absolute w-[400px] h-[400px] bg-purple-300/30 rounded-full filter blur-[60px]"
+          style={{ 
+            left: `${mousePosition.x * 100}%`,
+            top: `${mousePosition.y * 100}%`,
+            transform: 'translate(-50%, -50%)',
+          }}
+          animate={{
+            x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
+            y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
+          }}
+          transition={{
+            type: "spring",
+            damping: 25,
+            stiffness: 250
+          }}
+        />
+        
+        <motion.div 
+          className="absolute w-[200px] h-[200px] bg-purple-400/40 rounded-full filter blur-[30px]"
+          style={{ 
+            left: `${mousePosition.x * 100}%`,
+            top: `${mousePosition.y * 100}%`,
+            transform: 'translate(-50%, -50%)',
+          }}
+          animate={{
+            x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
+            y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
+          }}
+          transition={{
+            type: "spring",
+            damping: 20,
+            stiffness: 300
           }}
         />
       </div>
-
-      <div className="relative max-w-7xl mx-auto px-6 min-h-screen flex items-center">
-        <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 min-h-screen flex items-center">
+        <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center w-full">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
-            className="space-y-8"
+            className="space-y-6 md:space-y-8"
           >
             <motion.div 
               className="inline-block bg-gradient-to-r from-purple-400 to-blue-400 text-transparent bg-clip-text"
@@ -58,11 +112,11 @@ const Hero = () => {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.2 }}
             >
-              <h2 className="text-xl font-medium">Welcome to my portfolio</h2>
+              <h2 className="text-lg md:text-xl font-medium">Welcome to my portfolio</h2>
             </motion.div>
 
             <div className="space-y-4">
-              <h1 className="text-5xl lg:text-6xl font-bold text-white">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white">
                 Hi, I'm{' '}
                 <span className="bg-gradient-to-r from-purple-400 via-pink-500 to-red-500 text-transparent bg-clip-text">
                   ISMAIL BENAAITONA
@@ -75,26 +129,26 @@ const Hero = () => {
                   initial={{ y: 20, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   exit={{ y: -20, opacity: 0 }}
-                  className="text-2xl text-gray-300"
+                  className="text-xl sm:text-2xl text-gray-300"
                 >
                   I'm a {roles[currentRole]}
                 </motion.p>
               </div>
             </div>
 
-            <p className="text-gray-400 text-lg max-w-lg">
+            <p className="text-gray-400 text-base sm:text-lg max-w-lg">
               Crafting beautiful, responsive, and user-friendly web experiences 
               with modern technologies and creative design solutions.
             </p>
 
-            <div className="flex gap-4">
+            <div className="flex gap-3 sm:gap-4">
               {socialLinks.map((link) => (
                 <motion.a
                   key={link.label}
                   href={link.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-12 h-12 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center group transition-all duration-300"
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg bg-gray-800 hover:bg-gray-700 flex items-center justify-center group transition-all duration-300"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -103,11 +157,11 @@ const Hero = () => {
               ))}
             </div>
 
-            <div className="flex flex-wrap gap-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
               <motion.a
-                href="/resume.pdf"
-                download
-                className="px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
+                onClick={() => window.open(resume, "_blank")}
+                // download
+                className="px-6 sm:px-8 py-3 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg text-white font-medium hover:opacity-90 transition-opacity"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -116,7 +170,7 @@ const Hero = () => {
               
               <motion.a
                 href="#contact"
-                className="px-8 py-3 border border-purple-500 text-purple-500 rounded-lg font-medium hover:bg-purple-500/10 transition-colors"
+                className="px-6 sm:px-8 py-3 border border-purple-500 text-purple-500 rounded-lg font-medium hover:bg-purple-500/10 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -150,30 +204,6 @@ const Hero = () => {
                 alt="Spaceman illustration"
                 className="w-full h-full object-contain"
               />
-              
-              {/* Floating particles */}
-              {/* {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-3 h-3 bg-purple-500 rounded-full"
-                  animate={{
-                    y: [-20, 20],
-                    x: [-20, 20],
-                    scale: [1, 1.2, 1],
-                    opacity: [0.2, 0.8, 0.2],
-                  }}
-                  transition={{
-                    duration: 4,
-                    delay: i * 0.5,
-                    repeat: Infinity,
-                    ease: "easeInOut"
-                  }}
-                  style={{
-                    left: `${30 + (i * 10)}%`,
-                    top: `${20 + (i * 10)}%`
-                  }}
-                />
-              ))} */}
             </div>
           </motion.div>
         </div>
@@ -182,13 +212,13 @@ const Hero = () => {
       <div className="absolute bottom-4 w-full flex justify-center">
         <a href="#about" aria-label="Scroll to About section">
           <div className="w-[35px] h-[64px] rounded-3xl border-4 border-[#915EFF] flex justify-center items-start p-2">
-      <motion.div 
+            <motion.div 
               animate={{ y: [0, 24, 0] }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
+              transition={{
+                duration: 2,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
               className="w-3 h-3 rounded-full bg-[#915EFF]"
             />
           </div>
@@ -197,7 +227,5 @@ const Hero = () => {
     </div>
   );
 };
-
-// export default Hero;
 
 export default SectionWrapper(Hero, "home");

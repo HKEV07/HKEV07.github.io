@@ -13,7 +13,7 @@ import javascript from "./tech/javascript.png";
 import reactjs from "./tech/reactjs.png";
 import tailwind from "./tech/tailwind.png";
 
-
+import resume from "./resume.pdf"
 import transcendence from "./trandadan.jpeg";
 import inception from "./inception.webp";
 import irc from "./irc.webp";
@@ -49,4 +49,5 @@ export {
   pdf,
   pdf_icon,
   user_icon,
+  resume,
 };

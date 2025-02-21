@@ -1,28 +1,37 @@
-import React, { useRef } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
 import * as THREE from 'three';
 
 const Earth = () => {
   const meshRef = useRef();
+  const [hue, setHue] = useState(0);
 
-  // Animation loop
+
   useFrame(() => {
     if (meshRef.current) {
-      meshRef.current.rotation.y += 0.002; // Rotate the Earth
+      meshRef.current.rotation.y += 0.002;
+      
+
+      setHue((prevHue) => (prevHue + 0.001) % 1);
+      
+      const color = new THREE.Color();
+      color.setHSL(hue, 0.5, 0.5);
+      meshRef.current.material.color = color;
     }
   });
+
+  const initialColor = new THREE.Color();
+  initialColor.setHSL(0, 0.5, 0.5);
 
   return (
     <mesh ref={meshRef}>
       <sphereGeometry args={[2, 32, 32]} /> 
       <meshPhongMaterial
-        color={0xffffff} // White color (you can replace this with a texture)
-        wireframe={true} // Show wireframe
+        color={initialColor}
+        wireframe={true}
         transparent={true}
         opacity={0.8}
       />
-      {/* Lights */}
       <pointLight position={[10, 10, 10]} intensity={1} />
       <ambientLight intensity={0.2} />
     </mesh>
@@ -38,16 +47,13 @@ const EarthCanvas = () => {
           near: 0.1,
           far: 200,
           position: [-4, 3, 6],
+          onUpdate: (self) => {
+            self.lookAt(0, 0, 0);
+            self.updateProjectionMatrix();
+          }
         }}
       >
         <Earth />
-        <OrbitControls
-          autoRotate 
-          autoRotateSpeed={0.5}
-          enableZoom={false} 
-          maxDistance={50} 
-          minDistance={3} 
-        />
       </Canvas>
     </div>
   );

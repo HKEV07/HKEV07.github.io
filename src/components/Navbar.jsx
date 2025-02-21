@@ -88,8 +88,8 @@ const Navbar = () => {
           ))}
         </ul>
 
-        <div className='sm:hidden flex flex-1 justify-end items-center h-5'>
-          <div className="relative inline-block pl-4 pt-0 mt-0">
+        <div className='sm:hidden block h-3'>
+          <div className="fixed top-4 right-5 z-50 cursor-pointer ">
             <div
               className="h-[25px] w-[30px] relative z-10 cursor-pointer"
               onClick={() => setToggle(!toggle)}
@@ -112,7 +112,6 @@ const Navbar = () => {
             <div className={`absolute top-5 right-[50px] w-0 h-0 bg-opacity-60  rounded-bl-[200%] transition-all duration-600 ease-[cubic-bezier(0.77,0,0.175,1)]
               ${toggle ? 'w-full h-full' : ''}`} />
             <div className={`absolute top-5 right-[50px] w-0 h-0 
-              
               transition-all duration-600 delay-200 ease-[cubic-bezier(0.77,0,0.175,1)]
               ${toggle ? 'w-full h-full' : ''}`} /> 
 
