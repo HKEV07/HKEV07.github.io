@@ -1,12 +1,49 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { SectionWrapper } from "../hoc";
 import { resume, space_man } from '../assets';
 
 const Hero = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 }); // Center by default
+  const [mousePosition, setMousePosition] = useState({ x: 0.5, y: 0.5 });
+  const [isMobile, setIsMobile] = useState(false);
+  const [isHomeVisible, setIsHomeVisible] = useState(true);
   const roles = ["Frontend Developer", "UI Designer", "Web Creator"];
   const [currentRole, setCurrentRole] = useState(0);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+    
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Track home section visibility
+  useEffect(() => {
+    const homeSection = document.getElementById('home');
+    
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsHomeVisible(entry.isIntersecting);
+      },
+      {
+        threshold: 0.1
+      }
+    );
+
+    if (homeSection) {
+      observer.observe(homeSection);
+    }
+
+    return () => {
+      if (homeSection) {
+        observer.unobserve(homeSection);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -16,6 +53,8 @@ const Hero = () => {
   }, []);
 
   const handlePointerMove = (e) => {
+    if (isMobile || !isHomeVisible) return;
+    
     const clientX = e.touches ? e.touches[0].clientX : e.clientX;
     const clientY = e.touches ? e.touches[0].clientY : e.clientY;
     
@@ -25,9 +64,12 @@ const Hero = () => {
     });
   };
 
+  // Modified touch handling to only prevent default on desktop
   const handleTouchMove = (e) => {
-    e.preventDefault(); 
-    handlePointerMove(e);
+    if (!isMobile && isHomeVisible) {
+      e.preventDefault();
+      handlePointerMove(e);
+    }
   };
 
   const socialLinks = [
@@ -38,66 +80,77 @@ const Hero = () => {
 
   return (
     <div 
-      className="relative bottom-20 min-h-screen w-full bg-gradient-to-br overflow-hidden touch-none"
+      className={`relative bottom-20 min-h-screen w-full bg-gradient-to-br overflow-hidden ${!isMobile ? 'touch-none' : ''}`}
       onMouseMove={handlePointerMove}
       onTouchMove={handleTouchMove}
-      onTouchStart={handleTouchMove}
+      onTouchStart={isMobile ? undefined : handleTouchMove}
     >
-      <div className="fixed inset-0 pointer-events-none">
-        <motion.div 
-          className="absolute w-[800px] h-[800px] bg-purple-200/10 rounded-full filter blur-[100px]"
-          style={{ 
-            left: `${mousePosition.x * 100}%`,
-            top: `${mousePosition.y * 100}%`,
-            transform: 'translate(-50%, -50%)',
-          }}
-          animate={{
-            x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
-            y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
-          }}
-          transition={{
-            type: "spring",
-            damping: 30,
-            stiffness: 200
-          }}
-        />
-        
-        <motion.div 
-          className="absolute w-[400px] h-[400px] bg-purple-300/30 rounded-full filter blur-[60px]"
-          style={{ 
-            left: `${mousePosition.x * 100}%`,
-            top: `${mousePosition.y * 100}%`,
-            transform: 'translate(-50%, -50%)',
-          }}
-          animate={{
-            x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
-            y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
-          }}
-          transition={{
-            type: "spring",
-            damping: 25,
-            stiffness: 250
-          }}
-        />
-        
-        <motion.div 
-          className="absolute w-[200px] h-[200px] bg-purple-400/40 rounded-full filter blur-[30px]"
-          style={{ 
-            left: `${mousePosition.x * 100}%`,
-            top: `${mousePosition.y * 100}%`,
-            transform: 'translate(-50%, -50%)',
-          }}
-          animate={{
-            x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
-            y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
-          }}
-          transition={{
-            type: "spring",
-            damping: 20,
-            stiffness: 300
-          }}
-        />
-      </div>
+      <AnimatePresence>
+        {isHomeVisible && (
+          <motion.div 
+            className="fixed inset-0 pointer-events-none"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <motion.div 
+              className="absolute w-[800px] h-[800px] bg-purple-200/10 rounded-full filter blur-[100px]"
+              style={{ 
+                left: isMobile ? '50%' : `${mousePosition.x * 100}%`,
+                top: isMobile ? '50%' : `${mousePosition.y * 100}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              animate={!isMobile ? {
+                x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
+                y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
+              } : {}}
+              transition={{
+                type: "spring",
+                damping: 30,
+                stiffness: 200
+              }}
+            />
+            
+            <motion.div 
+              className="absolute w-[400px] h-[400px] bg-purple-300/30 rounded-full filter blur-[60px]"
+              style={{ 
+                left: isMobile ? '50%' : `${mousePosition.x * 100}%`,
+                top: isMobile ? '50%' : `${mousePosition.y * 100}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              animate={!isMobile ? {
+                x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
+                y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
+              } : {}}
+              transition={{
+                type: "spring",
+                damping: 25,
+                stiffness: 250
+              }}
+            />
+            
+            <motion.div 
+              className="absolute w-[200px] h-[200px] bg-purple-400/40 rounded-full filter blur-[30px]"
+              style={{ 
+                left: isMobile ? '50%' : `${mousePosition.x * 100}%`,
+                top: isMobile ? '50%' : `${mousePosition.y * 100}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+              animate={!isMobile ? {
+                x: mousePosition.x * window.innerWidth - window.innerWidth / 2,
+                y: mousePosition.y * window.innerHeight - window.innerHeight / 2,
+              } : {}}
+              transition={{
+                type: "spring",
+                damping: 20,
+                stiffness: 300
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 min-h-screen flex items-center">
         <div className="grid lg:grid-cols-2 gap-8 md:gap-12 items-center w-full">
           <motion.div
